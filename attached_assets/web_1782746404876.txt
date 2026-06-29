@@ -1,0 +1,30 @@
+Tool Number 1 - Python URL Checker (Loop)
+
+Make Website Like "https://ffurl-checker-py.lovable.app" These Website 
+- Login System Will Available Need Put Valid Email And Passowrd Sign In - Sign Out
+- Python URL Checker, User Will Send Words And Links In Link (Word) Placeholder Will Give For Example :- "https://dl.dir.freefiremobile.com/common/Local/IND/config/26J01_TW1_(Word)_Tab_SG_en.jpg" And It Will Check That Links With All Words From The User Gave 
+- And The Every Session Will Save In History With Random Name 
+- And The User Can Set Loop That Session For History It Will Check That Session Automatically Every 5 Minutes or 10 Or 15 What User Will Set, It Will Check Continue Every Time After (null time user will set) If Any Link Start Working Or Working Link Found It Will Send Notification Via Browser + In To The Email, Message = Working! Working! New Working Link Found Check Out!" (Make The Website Perfectly No Mistake)
+- When User Will Check Link Live Then Check Very Fast I Mean Check Link Very Fast Beacuse It's Python System Python Is Amazing
+
+
+Tool Number 2 :- Link Maker 
+
+Make That Tool Like "https://leaksofff.unaux.com" 
+- Use Can Choose File Which Image User Want To Make Link And Can Make Link From Link Also
+- Can Rename The File Or Can Set Link Word
+- Link Path = (main domain)common/Local/IND/config/(Filename)(png~jpg) - Default Path
+Path 2 = common/OB54/CSH/(Filename)(png~jpg)
+Use Can Also Select jpg or png Format
+
+Both Tool Divided In Different Section 
+
+And Last Add Button (More Tools) If Click That Button Then Redirect To "https://lof-tools-ff.vercel.app/" 
+
+Note :- (I Want To Host This Website In "vercel.app" So Add And Make The Like That I Can Deploy Repository To "vercel.app" Easly Without Error I Can Host)
+
+I'm Not Making Any "api" Or Using Any "api" It's An Full New Website You Need to Make This Website.
+
+I Give Some Website Link Called Like They Are Reference They Are Same Tool Like That I'm Making
+
+(Make The Tools Website Perfect And Correctly Please Don't Do Any Mistake And Error)
