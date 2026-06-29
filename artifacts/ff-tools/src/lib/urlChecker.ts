@@ -1,49 +1,55 @@
 export interface CheckResult {
   word: string;
+  templateLine: string;
   url: string;
   status: "working" | "dead" | "checking" | "pending";
-  statusCode?: number;
   responseTime?: number;
   checkedAt?: string;
+  previewUrl?: string;
 }
 
 export function buildUrl(template: string, word: string): string {
   return template.replace(/\(Word\)/gi, word.trim());
 }
 
-export async function checkUrl(url: string): Promise<{ working: boolean; statusCode?: number; responseTime: number }> {
-  const start = Date.now();
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    await fetch(url, {
-      method: "HEAD",
-      signal: controller.signal,
-      cache: "no-store",
-      mode: "no-cors",
-    });
-    clearTimeout(timeout);
-    return { working: true, statusCode: 200, responseTime: Date.now() - start };
-  } catch (err: unknown) {
-    const responseTime = Date.now() - start;
-    if (err instanceof Error && err.name === "AbortError") {
-      return { working: false, responseTime };
+function isImageUrl(url: string): boolean {
+  return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i.test(url.split("?")[0]);
+}
+
+export function checkUrl(url: string): Promise<{ working: boolean; responseTime: number; previewUrl?: string }> {
+  return new Promise(resolve => {
+    const start = Date.now();
+    let settled = false;
+
+    const done = (working: boolean, previewUrl?: string) => {
+      if (settled) return;
+      settled = true;
+      resolve({ working, responseTime: Date.now() - start, previewUrl });
+    };
+
+    const timeout = setTimeout(() => done(false), 12000);
+
+    if (isImageUrl(url)) {
+      const img = new Image();
+      img.onload = () => {
+        clearTimeout(timeout);
+        done(true, url);
+      };
+      img.onerror = () => {
+        clearTimeout(timeout);
+        done(false);
+      };
+      img.src = url + (url.includes("?") ? "&" : "?") + "_t=" + Date.now();
+    } else {
+      fetch(url, { method: "HEAD", cache: "no-store", mode: "no-cors" })
+        .then(() => { clearTimeout(timeout); done(true); })
+        .catch(() => {
+          fetch(url, { method: "GET", cache: "no-store", mode: "no-cors" })
+            .then(() => { clearTimeout(timeout); done(true); })
+            .catch(() => { clearTimeout(timeout); done(false); });
+        });
     }
-    try {
-      const controller2 = new AbortController();
-      const timeout2 = setTimeout(() => controller2.abort(), 6000);
-      await fetch(url, {
-        method: "GET",
-        signal: controller2.signal,
-        cache: "no-store",
-        mode: "no-cors",
-      });
-      clearTimeout(timeout2);
-      return { working: true, responseTime: Date.now() - start };
-    } catch {
-      return { working: false, responseTime };
-    }
-  }
+  });
 }
 
 const ADJECTIVES = ["swift","brave","golden","silver","alpha","omega","delta","sigma","ghost","shadow","blaze","storm","thunder","frost","neon","pixel","cyber","ultra","mega","hyper"];
@@ -56,25 +62,22 @@ export function generateSessionName(): string {
   return `${adj}-${noun}-${num}`;
 }
 
-export type CheckMode = "template" | "multilink";
-
 export interface Session {
   id: string;
   name: string;
-  mode: CheckMode;
-  template: string;
+  templates: string[];
   words: string[];
-  links: string[];
   results: CheckResult[];
   createdAt: string;
   lastCheckedAt?: string;
+  nextCheckAt?: string;
   loopInterval?: number;
   loopActive?: boolean;
   workingLinks: string[];
   notifEmail?: string;
 }
 
-const SESSIONS_KEY = "ff_tools_sessions_v2";
+const SESSIONS_KEY = "ff_tools_sessions_v3";
 
 export function saveSessions(sessions: Session[]): void {
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
@@ -86,4 +89,12 @@ export function loadSessions(): Session[] {
   } catch {
     return [];
   }
+}
+
+export function fmt12h(iso?: string): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("en-US", {
+    month: "short", day: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true,
+  });
 }
