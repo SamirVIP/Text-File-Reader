@@ -16,15 +16,14 @@ export async function checkUrl(url: string): Promise<{ working: boolean; statusC
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-    const response = await fetch(url, {
+    await fetch(url, {
       method: "HEAD",
       signal: controller.signal,
       cache: "no-store",
       mode: "no-cors",
     });
     clearTimeout(timeout);
-    const responseTime = Date.now() - start;
-    return { working: true, statusCode: response.status || 200, responseTime };
+    return { working: true, statusCode: 200, responseTime: Date.now() - start };
   } catch (err: unknown) {
     const responseTime = Date.now() - start;
     if (err instanceof Error && err.name === "AbortError") {
@@ -47,8 +46,8 @@ export async function checkUrl(url: string): Promise<{ working: boolean; statusC
   }
 }
 
-const ADJECTIVES = ["swift", "brave", "golden", "silver", "alpha", "omega", "delta", "sigma", "ghost", "shadow", "blaze", "storm", "thunder", "frost", "neon", "pixel", "cyber", "ultra", "mega", "hyper"];
-const NOUNS = ["wolf", "eagle", "hunter", "runner", "raider", "scout", "ranger", "warrior", "striker", "phantom", "falcon", "cobra", "panther", "titan", "viper", "apex", "nexus", "core", "pulse", "bolt"];
+const ADJECTIVES = ["swift","brave","golden","silver","alpha","omega","delta","sigma","ghost","shadow","blaze","storm","thunder","frost","neon","pixel","cyber","ultra","mega","hyper"];
+const NOUNS = ["wolf","eagle","hunter","runner","raider","scout","ranger","warrior","striker","phantom","falcon","cobra","panther","titan","viper","apex","nexus","core","pulse","bolt"];
 
 export function generateSessionName(): string {
   const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
@@ -57,20 +56,25 @@ export function generateSessionName(): string {
   return `${adj}-${noun}-${num}`;
 }
 
+export type CheckMode = "template" | "multilink";
+
 export interface Session {
   id: string;
   name: string;
+  mode: CheckMode;
   template: string;
   words: string[];
+  links: string[];
   results: CheckResult[];
   createdAt: string;
   lastCheckedAt?: string;
   loopInterval?: number;
   loopActive?: boolean;
   workingLinks: string[];
+  notifEmail?: string;
 }
 
-const SESSIONS_KEY = "ff_tools_sessions";
+const SESSIONS_KEY = "ff_tools_sessions_v2";
 
 export function saveSessions(sessions: Session[]): void {
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
