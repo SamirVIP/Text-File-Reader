@@ -1,0 +1,8 @@
+{
+  "buildCommand": "pnpm --filter @workspace/ff-tools run build",
+  "outputDirectory": "artifacts/ff-tools/dist/public",
+  "installCommand": "pnpm install",
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
