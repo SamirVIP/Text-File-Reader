@@ -1,28 +1,26 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-
 const RESEND_API_KEY = "re_66qSGQ9y_5ijUp5mkcbCNkxPR7aPvSn4x";
 
-function setCors(res: ServerResponse) {
+function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
-function readBody(req: IncomingMessage): Promise<string> {
+function readBody(req) {
   return new Promise((resolve, reject) => {
     let data = "";
-    req.on("data", (chunk: Buffer) => { data += chunk.toString(); });
+    req.on("data", (chunk) => { data += chunk.toString(); });
     req.on("end", () => resolve(data));
     req.on("error", reject);
   });
 }
 
-function json(res: ServerResponse, status: number, body: unknown) {
+function json(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(body));
 }
 
-export default async function handler(req: IncomingMessage, res: ServerResponse) {
+export default async function handler(req, res) {
   setCors(res);
 
   if (req.method === "OPTIONS") {
@@ -35,9 +33,9 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return;
   }
 
-  let body: { to?: string; subject?: string; html?: string };
+  let body;
   try {
-    body = JSON.parse(await readBody(req)) as typeof body;
+    body = JSON.parse(await readBody(req));
   } catch {
     json(res, 400, { error: "Invalid JSON body" });
     return;
@@ -64,7 +62,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       }),
     });
 
-    const data = await response.json().catch(() => ({})) as { message?: string };
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       json(res, response.status, { error: data.message ?? "Resend error" });
@@ -72,7 +70,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     json(res, 200, { success: true });
-  } catch (err: unknown) {
+  } catch (err) {
     json(res, 500, { error: err instanceof Error ? err.message : "Server error" });
   }
 }
