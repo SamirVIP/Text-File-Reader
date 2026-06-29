@@ -1,0 +1,15 @@
+{
+  "buildCommand": "pnpm --filter @workspace/ff-tools run build",
+  "outputDirectory": "artifacts/ff-tools/dist",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": "vite",
+  "functions": {
+    "artifacts/ff-tools/api/send-email.ts": {
+      "runtime": "nodejs22.x"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/send-email", "destination": "/artifacts/ff-tools/api/send-email" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
