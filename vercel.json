@@ -1,7 +1,7 @@
 {
   "buildCommand": "pnpm --filter @workspace/ff-tools run build",
   "outputDirectory": "artifacts/ff-tools/dist/public",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
